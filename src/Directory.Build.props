@@ -1,0 +1,9 @@
+﻿<Project>
+
+	<Import Project="./.build-system/Directory.Build.props"/>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CS0436;</NoWarn>
+	</PropertyGroup>
+
+</Project>
