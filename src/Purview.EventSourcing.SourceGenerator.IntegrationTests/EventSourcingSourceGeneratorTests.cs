@@ -16,7 +16,7 @@ namespace Testing;
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(empty);
+		var generationResult = await GenerateAsync(empty);
 
 		// Assert
 		await TestHelpers.Verify(generationResult, autoVerifyTemplates: false);

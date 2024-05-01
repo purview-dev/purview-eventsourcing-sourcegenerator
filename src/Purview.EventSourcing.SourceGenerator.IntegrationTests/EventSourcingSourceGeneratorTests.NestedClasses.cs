@@ -7,7 +7,7 @@ partial class EventSourcingSourceGeneratorTests
 	public async Task Generate_GivenAggregateIsNestedClass_GeneratesWithinNestedClass()
 	{
 		// Arrange
-		string basicAggregate = @"
+		var basicAggregate = @"
 using Purview.EventSourcing;
 using Purview.EventSourcing.Aggregates;
 
@@ -25,7 +25,7 @@ public partial class ParentClass
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult);
@@ -35,7 +35,7 @@ public partial class ParentClass
 	public async Task Generate_GivenAggregateIsNestedClasses_GeneratesWithinNestedClasses()
 	{
 		// Arrange
-		string basicAggregate = @"
+		var basicAggregate = @"
 using Purview.EventSourcing;
 using Purview.EventSourcing.Aggregates;
 
@@ -53,7 +53,7 @@ public partial class ParentClass {
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult);

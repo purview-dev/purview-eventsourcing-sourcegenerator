@@ -23,7 +23,7 @@ public partial class TestAggregate : IAggregate {
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult);

@@ -20,7 +20,7 @@ public partial class TestAggregate
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult,
@@ -49,7 +49,7 @@ public class TestAggregate : IAggregate
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult,
@@ -76,7 +76,7 @@ public partial class TestAggregate : IAggregate {
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult,
@@ -107,7 +107,7 @@ public partial class TestAggregate : IAggregate {
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult, v => v.ScrubInlineGuids(), validateNonEmptyDiagnostics: true);
@@ -135,7 +135,7 @@ public partial class TestAggregate : IAggregate {
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult, v => v.ScrubInlineGuids(), validateNonEmptyDiagnostics: true);

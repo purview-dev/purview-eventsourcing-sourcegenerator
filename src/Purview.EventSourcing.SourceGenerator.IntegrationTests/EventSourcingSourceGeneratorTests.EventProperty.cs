@@ -10,7 +10,7 @@ partial class EventSourcingSourceGeneratorTests
 	public async Task Generate_GivenBasicPropertyWithSpecifiedPropertyName_GeneratesPropertyEventAndApplier(string propertyName)
 	{
 		// Arrange
-		string basicAggregate = @$"
+		var basicAggregate = @$"
 using Purview.EventSourcing;
 using Purview.EventSourcing.Aggregates;
 
@@ -24,7 +24,7 @@ public partial class TestAggregate : IAggregate {{
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult, v => v.UseParameters(propertyName));
@@ -34,7 +34,7 @@ public partial class TestAggregate : IAggregate {{
 	public async Task Generate_GivenBasicPropertyWithSpecifiedEventTypeName_GeneratesEvent()
 	{
 		// Arrange
-		string basicAggregate = @"
+		var basicAggregate = @"
 using Purview.EventSourcing;
 using Purview.EventSourcing.Aggregates;
 
@@ -48,7 +48,7 @@ public partial class TestAggregate : IAggregate {
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult);

@@ -7,11 +7,12 @@ namespace Purview.EventSourcing.SourceGenerator.Helpers;
 
 static class Utilities
 {
-	static readonly Regex _titleCaseSplit = new("(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])", RegexOptions.Compiled);
-	static readonly SymbolDisplayFormat _symbolDisplayFormat = new(
+	static readonly Regex TitleCaseSplit = new("(?<!^)([A-Z][a-z]|(?<=[a-z])[A-Z])", RegexOptions.Compiled);
+	static readonly SymbolDisplayFormat SymbolDisplayFormat = new(
 		typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces
 	);
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase")]
 	public static string GetAggregateName(string aggregateType)
 	{
 		const string aggregate = "Aggregate";
@@ -23,7 +24,7 @@ static class Utilities
 				aggregateType = result;
 		}
 
-		return _titleCaseSplit.Replace(aggregateType, "-$1").ToLowerInvariant();
+		return TitleCaseSplit.Replace(aggregateType, "-$1").ToLowerInvariant();
 	}
 
 	public static StringBuilder AppendTabs(this StringBuilder builder, int tabs)
@@ -153,10 +154,9 @@ static class Utilities
 			parentClass = parentClass.Parent as ClassDeclarationSyntax;
 		}
 
-		if (parentClasses.Count == 0)
-			return null;
-
-		return string.Join(".", parentClasses);
+		return parentClasses.Count == 0
+			? null
+			: string.Join(".", parentClasses);
 	}
 
 	public static string GetNamespace(TypeDeclarationSyntax typeSymbol)
@@ -189,7 +189,7 @@ static class Utilities
 	}
 
 	public static string GetFullyQualifiedName(ITypeSymbol namedType)
-		=> namedType.ToDisplayString(_symbolDisplayFormat);
+		=> namedType.ToDisplayString(SymbolDisplayFormat);
 
 	//static public string GetFullyQualifiedName(TypeDeclarationSyntax type)
 	//	=> GetFullNamespace(type, true) + type.Identifier.Text;
@@ -201,9 +201,7 @@ static class Utilities
 
 		string? fullNamespace = null;
 		if (typeNamespace != null)
-		{
 			fullNamespace = typeNamespace;
-		}
 
 		if (parentClasses != null)
 		{

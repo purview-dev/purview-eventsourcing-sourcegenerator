@@ -49,6 +49,8 @@ public abstract class SourceGeneratorTestBase<TGenerator>(ITestOutputHelper? tes
 
 	protected void ConfigureGenerator(object generator)
 	{
+		ArgumentNullException.ThrowIfNull(generator, nameof(generator));
+
 		GuardGenerator(generator);
 
 		if (generator is ILogSupport logging && testOutputHelper is not null)
@@ -67,9 +69,7 @@ public abstract class SourceGeneratorTestBase<TGenerator>(ITestOutputHelper? tes
 				testOutputHelper.WriteLine(prefix + ": " + message);
 
 				if (ThrowOnLoggedOnError)
-				{
 					outputType.Should().NotBe(OutputType.Error, message);
-				}
 			});
 		}
 	}
@@ -93,9 +93,7 @@ public abstract class SourceGeneratorTestBase<TGenerator>(ITestOutputHelper? tes
 	{
 		List<SyntaxTree> nodes = [];
 		foreach (var tree in generationResult.Result.GeneratedTrees)
-		{
 			nodes.Add((await tree.GetRootAsync(cancellationToken)).SyntaxTree);
-		}
 
 		return generationResult.Compilation.AddSyntaxTrees(nodes);
 	}
@@ -144,21 +142,19 @@ public abstract class SourceGeneratorTestBase<TGenerator>(ITestOutputHelper? tes
 	}
 
 	protected async Task<GenerationResult> GenerateAsync(
-			AdditionalText[] csharpDocuments,
-			AdditionalText[]? additionalTexts = null,
-			ImmutableDictionary<string, string>? globalOptions = null,
-			Func<Project, Project>? projectModifier = null,
-			bool debugLog = true)
+		AdditionalText[] csharpDocuments,
+		AdditionalText[]? additionalTexts = null,
+		ImmutableDictionary<string, string>? globalOptions = null,
+		Func<Project, Project>? projectModifier = null,
+		bool debugLog = true)
 	{
 		CSharpParseOptions parseOptions = new(kind: SourceCodeKind.Regular, documentationMode: DocumentationMode.Parse);
 
 		globalOptions ??= ImmutableDictionary<string, string>.Empty;
 		if (debugLog)
-		{
 			globalOptions = globalOptions.SetItem("purview_debug_log", "true");
-		}
 
-		TestAnalyzerConfigOptionsProvider optionsProvider = TestAnalyzerConfigOptionsProvider.Empty
+		var optionsProvider = TestAnalyzerConfigOptionsProvider.Empty
 			.WithGlobalOptions(new TestAnalyzerConfigOptions(globalOptions));
 		if (additionalTexts is not null && additionalTexts.Length != 0)
 		{
@@ -215,9 +211,7 @@ public abstract class SourceGeneratorTestBase<TGenerator>(ITestOutputHelper? tes
 		if (csharpDocuments != null && csharpDocuments.Length > 0)
 		{
 			foreach (var csDoc in csharpDocuments)
-			{
 				project = project.AddDocument(csDoc.Path, csDoc.GetText()!).Project;
-			}
 		}
 
 		project = SetupProject(project);

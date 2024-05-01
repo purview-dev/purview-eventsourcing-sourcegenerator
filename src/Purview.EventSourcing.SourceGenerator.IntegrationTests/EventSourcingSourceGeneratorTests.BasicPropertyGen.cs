@@ -20,7 +20,7 @@ public partial class TestAggregate : IAggregate {
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult);
@@ -34,7 +34,7 @@ public partial class TestAggregate : IAggregate {
 	public async Task Generate_GivenBasicPropertyWithExplicitPrivateSetter_GeneratesPropertyEventAndApplier(string privateSetter)
 	{
 		// Arrange
-		string basicAggregate = @$"
+		var basicAggregate = @$"
 using Purview.EventSourcing;
 using Purview.EventSourcing.Aggregates;
 
@@ -48,7 +48,7 @@ public partial class TestAggregate : IAggregate {{
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult, v => v.UseParameters(privateSetter));
@@ -61,7 +61,7 @@ public partial class TestAggregate : IAggregate {{
 	public async Task Generate_GivenBasicPropertyWithExplicitName_GeneratesPropertyEventAndApplier(string name)
 	{
 		// Arrange
-		string basicAggregate = @$"
+		var basicAggregate = @$"
 using Purview.EventSourcing;
 using Purview.EventSourcing.Aggregates;
 
@@ -75,7 +75,7 @@ public partial class TestAggregate : IAggregate {{
 ";
 
 		// Act
-		GenerationResult generationResult = await GenerateAsync(basicAggregate);
+		var generationResult = await GenerateAsync(basicAggregate);
 
 		// Assert
 		await TestHelpers.Verify(generationResult, v => v.UseParameters(name));
