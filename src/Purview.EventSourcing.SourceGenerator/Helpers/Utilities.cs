@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,6 +12,25 @@ static class Utilities
 	static readonly SymbolDisplayFormat SymbolDisplayFormat = new(
 		typeQualificationStyle: SymbolDisplayTypeQualificationStyle.NameAndContainingTypesAndNamespaces
 	);
+
+	static readonly Lazy<ImmutableDictionary<Templates.TypeInfo, string>> _typeInfoToSystemTypeMapper = new(GenerateSystemTypeMap);
+	static readonly Lazy<ImmutableDictionary<string, string>> _fullTypeNameToSystemTypeMapper = new(() => _typeInfoToSystemTypeMapper.Value.ToImmutableDictionary(x => x.Key.FullName, x => x.Value));
+
+	static ImmutableDictionary<Templates.TypeInfo, string> GenerateSystemTypeMap()
+		// Putting this here ensures it's not accessed
+		// before the static fields have been initialised.
+		=> new Dictionary<Templates.TypeInfo, string>
+		{
+			{ Constants.Shared.String, Constants.Shared.StringKeyword },
+			{ Constants.Shared.Boolean, Constants.Shared.BoolKeyword },
+			{ Constants.Shared.Byte, Constants.Shared.ByteKeyword },
+			{ Constants.Shared.Int16, Constants.Shared.ShortKeyword },
+			{ Constants.Shared.Int32, Constants.Shared.IntKeyword },
+			{ Constants.Shared.Int64, Constants.Shared.LongKeyword },
+			{ Constants.Shared.Single, Constants.Shared.FloatKeyword },
+			{ Constants.Shared.Double, Constants.Shared.DoubleKeyword },
+			{ Constants.Shared.Decimal, Constants.Shared.DecimalKeyword }
+		}.ToImmutableDictionary();
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase")]
 	public static string GetAggregateName(string aggregateType)
@@ -188,8 +208,29 @@ static class Utilities
 		return string.Empty;
 	}
 
-	public static string GetFullyQualifiedName(ITypeSymbol namedType)
-		=> namedType.ToDisplayString(SymbolDisplayFormat);
+	public static string GetFullyQualifiedOrSystemName(ITypeSymbol namedType, bool trimNullableAnnotation = true)
+	{
+		var result = namedType.ToDisplayString(SymbolDisplayFormat) ?? namedType.ToString();
+		if (namedType as INamedTypeSymbol is { IsGenericType: true, IsValueType: false } genericType)
+		{
+			List<string> typeArguments = [];
+			foreach (var typeArgument in genericType.TypeArguments)
+				typeArguments.Add(GetFullyQualifiedOrSystemName(typeArgument));
+
+			result += $"<{string.Join(", ", typeArguments)}>";
+		}
+
+		if (trimNullableAnnotation && namedType.NullableAnnotation == NullableAnnotation.Annotated)
+			result = result.TrimEnd('?');
+
+		return result.Convert();
+	}
+
+	static public string Convert(this Templates.TypeInfo type)
+		=> _typeInfoToSystemTypeMapper.Value.GetValueOrDefault(type, type.FullName);
+
+	static public string Convert(this string type)
+		=> _fullTypeNameToSystemTypeMapper.Value.GetValueOrDefault(type, type);
 
 	//static public string GetFullyQualifiedName(TypeDeclarationSyntax type)
 	//	=> GetFullNamespace(type, true) + type.Identifier.Text;

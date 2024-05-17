@@ -7,6 +7,28 @@ namespace Purview.EventSourcing.SourceGenerator.Helpers;
 
 static class SharedHelpers
 {
+	public static bool IsValidationAttribute(AttributeData attribute)
+	{
+		var attributeClass = attribute.AttributeClass;
+		while (attributeClass != null)
+		{
+			if (Constants.Shared.ValidationAttribute.Equals(attributeClass))
+				return true;
+
+			attributeClass = attributeClass.BaseType;
+		}
+
+		return false;
+	}
+
+	static public bool IsString(ITypeSymbol typeSymbol)
+		=> IsString(typeSymbol.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat));
+
+	static public bool IsString(string type)
+		=> type == Constants.Shared.String.Name
+			|| type == Constants.Shared.String.FullName
+			|| type == Constants.Shared.StringKeyword;
+
 	public static GenerateIAggregateAttributeRecord? GetGenerateIAggregateAttribute(
 		AttributeData attributeData,
 		SemanticModel semanticModel,

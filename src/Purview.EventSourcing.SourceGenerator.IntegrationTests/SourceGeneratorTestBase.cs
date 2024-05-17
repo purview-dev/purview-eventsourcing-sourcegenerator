@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
@@ -222,6 +223,7 @@ public abstract class SourceGeneratorTestBase<TGenerator>(ITestOutputHelper? tes
 				.AddMetadataReference(MetadataReference.CreateFromFile(Assembly.Load("netstandard, Version=2.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51").Location))
 				.AddMetadataReference(MetadataReference.CreateFromFile(Assembly.Load("System.Runtime").Location))
 
+				.AddMetadataReference(MetadataReference.CreateFromFile(typeof(ValidationAttribute).Assembly.Location))
 				.AddMetadataReference(MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location))
 				.AddMetadataReference(MetadataReference.CreateFromFile(typeof(IAggregate).Assembly.Location))
 				.AddMetadataReference(MetadataReference.CreateFromFile(typeof(EventSourcingSourceGenerator).Assembly.Location))

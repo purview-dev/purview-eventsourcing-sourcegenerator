@@ -7,7 +7,7 @@
       WarningLevel: 0,
       Location: Guid_1: (9,0)-(14,1),
       MessageFormat: {0} should be partial.,
-      Message: {0} should be partial.,
+      Message: Testing.TestAggregate should be partial.,
       Category: Activity.Usage
     }
   ]

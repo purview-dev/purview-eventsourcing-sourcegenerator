@@ -101,7 +101,7 @@ static partial class PipelineHelpers
 				if (!isEventType)
 					continue;
 
-				eventType = Utilities.GetFullyQualifiedName(parameterTypeSymbol.ContainingType);
+				eventType = Utilities.GetFullyQualifiedOrSystemName(parameterTypeSymbol.ContainingType);
 			}
 
 			var isVoid = method.ReturnType is PredefinedTypeSyntax predefinedTypeSyntax && predefinedTypeSyntax.Keyword.IsKind(SyntaxKind.VoidKeyword);

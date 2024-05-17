@@ -17,13 +17,13 @@ static partial class IAggregateImplementationEmitter
 
 		if (!target.IsPartialClass)
 		{
-			EventSourcingDiagnostics.Report(context.ReportDiagnostic, EventSourcingDiagnostics.TopLevelClass.ClassIsNotPartial, target.ClassLocation);
+			EventSourcingDiagnostics.Report(context.ReportDiagnostic, EventSourcingDiagnostics.TopLevelClass.ClassIsNotPartial, target.ClassLocation, target.FullyQualifiedName);
 			return;
 		}
 
 		if (!target.IAggregateInterfaceIsPresent)
 		{
-			EventSourcingDiagnostics.Report(context.ReportDiagnostic, EventSourcingDiagnostics.TopLevelClass.DoesNotImplementIAggregate, target.ClassLocation);
+			EventSourcingDiagnostics.Report(context.ReportDiagnostic, EventSourcingDiagnostics.TopLevelClass.DoesNotImplementIAggregate, target.ClassLocation, target.FullyQualifiedName, Constants.EventStore.IAggregate);
 			return;
 		}
 

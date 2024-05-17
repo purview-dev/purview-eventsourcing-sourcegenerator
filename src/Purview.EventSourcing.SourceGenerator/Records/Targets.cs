@@ -88,8 +88,19 @@ record EventPropertyGenerationTarget(
 	bool GenerateApplyMethod,
 	string ApplyMethodName,
 
+	ImmutableArray<ValidationAttributeTarget> ValidationAttributes,
+
 	Location? FieldLocation
 );
+
+record ValidationAttributeTarget(
+	string AttributeDetails,
+	ImmutableArray<string> CtorArgs,
+	ImmutableDictionary<string, string> NamedArgs
+)
+{
+	public bool HasArguments => CtorArgs.Length > 0 || NamedArgs.Count > 0;
+}
 
 /// <summary>
 /// Represents an Apply(Event) method found on the class, entirely user-defined.

@@ -2,7 +2,6 @@
 
 partial class EventSourcingSourceGeneratorTests
 {
-
 	[Fact]
 	public async Task Generate_GivenAggregateIsNestedClass_GeneratesWithinNestedClass()
 	{

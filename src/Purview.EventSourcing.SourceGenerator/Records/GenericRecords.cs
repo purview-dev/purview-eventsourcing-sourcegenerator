@@ -16,10 +16,7 @@ record AttributeValue<T>
 
 	public T? Or(T value)
 	{
-		if (IsSet)
-			return Value;
-
-		return value;
+		return IsSet ? Value : value;
 	}
 
 	public T? Value { get; }
@@ -48,10 +45,7 @@ record AttributeStringValue
 
 	public string Or(string value)
 	{
-		if (IsSet && !string.IsNullOrWhiteSpace(Value))
-			return Value!;
-
-		return value;
+		return IsSet && !string.IsNullOrWhiteSpace(Value) ? Value! : value;
 	}
 
 	public string? Value { get; }

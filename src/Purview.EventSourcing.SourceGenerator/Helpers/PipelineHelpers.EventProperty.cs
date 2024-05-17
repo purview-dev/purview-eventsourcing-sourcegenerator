@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Purview.EventSourcing.SourceGenerator.Records;
 
@@ -42,8 +43,9 @@ partial class PipelineHelpers
 		var classContainsGenerateAggregate = parentClass.AttributeLists
 			.SelectMany(m => m.Attributes)
 			.Any(Constants.Core.GenerateAggregateAttribute.Equals);
+
 		var fullNamespace = Utilities.GetFullNamespace(parentClass, true);
-		var propertyType = Utilities.GetFullyQualifiedName(fieldSymbol.Type);
+		var propertyType = Utilities.GetFullyQualifiedOrSystemName(fieldSymbol.Type);
 		var predefinedApplyMethods = GetPreDefinedApplyMethods(parentClass, logger, semanticModel, token);
 		var generatedApplyMethod = predefinedApplyMethods.FirstOrDefault(m =>
 		{
@@ -67,6 +69,8 @@ partial class PipelineHelpers
 
 		token.ThrowIfCancellationRequested();
 
+		var validationAttributes = GetValidationAttributes(fieldSymbol, logger, semanticModel, token);
+
 		return new(
 			ParentClassHasGenerateAggregate: classContainsGenerateAggregate,
 			AggregateClassName: parentClass.Identifier.Text,
@@ -81,7 +85,54 @@ partial class PipelineHelpers
 			PrivateSetter: eventPropertyAttribute.PrivateSetter.Value!.Value,
 			GenerateApplyMethod: generateApplyMethod,
 			ApplyMethodName: applyMethodName,
+			ValidationAttributes: validationAttributes,
 			FieldLocation: variableDeclarator.GetLocation()
 		);
+	}
+
+	static ImmutableArray<ValidationAttributeTarget> GetValidationAttributes(IFieldSymbol fieldSymbol, IGenerationLogger? logger, SemanticModel semanticModel, CancellationToken token)
+	{
+		List<ValidationAttributeTarget> validators = [];
+		foreach (var attribute in fieldSymbol.GetAttributes())
+		{
+			token.ThrowIfCancellationRequested();
+
+			if (!SharedHelpers.IsValidationAttribute(attribute))
+				continue;
+
+			logger?.Debug($"Found validation attribute '{attribute.AttributeClass!.Name}' on field '{fieldSymbol.Name}'.");
+
+			List<string> ctorArgs = [];
+			Dictionary<string, string> namedArgs = [];
+
+			foreach (var arg in attribute.ConstructorArguments)
+			{
+				// Get the fully qualified name of the parameter type
+				var attribValue = arg.Value?.ToString();
+				if (!arg.IsNull && arg.Type != null && SharedHelpers.IsString(arg.Type))
+					attribValue = attribValue!.Wrap();
+				else if (arg.IsNull)
+					attribValue = "null";
+
+				ctorArgs.Add(attribValue!);
+			}
+
+			foreach (var arg in attribute.NamedArguments)
+			{
+				// Get the fully qualified name of the property
+				string propertyName = arg.Key;
+				var attribValue = arg.Value.Value?.ToString();
+				if (!arg.Value.IsNull && arg.Value.Type != null && SharedHelpers.IsString(arg.Value.Type))
+					attribValue = attribValue!.Wrap();
+				else if (arg.Value.IsNull)
+					attribValue = "null";
+
+				namedArgs.Add(propertyName, attribValue!);
+			}
+
+			validators.Add(new(attribute.AttributeClass!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat), [.. ctorArgs], namedArgs.ToImmutableDictionary()));
+		}
+
+		return [.. validators];
 	}
 }

@@ -20,12 +20,12 @@ namespace Testing
 	partial class AdditionalEventsTestAggregate
 	{
 		// Property for field: _stringValue
-		public System.String? StringValue
+		public string? StringValue
 		{
 			get => _stringValue;
 			private set
 			{
-				if (System.Collections.Generic.Comparer<System.String>.Default.Compare(value, _stringValue) != 0)
+				if (System.Collections.Generic.Comparer<string>.Default.Compare(value, _stringValue) != 0)
 				{
 					RecordAndApplyEvent(new Testing.StringValueEvent() { StringValue = value });
 				}

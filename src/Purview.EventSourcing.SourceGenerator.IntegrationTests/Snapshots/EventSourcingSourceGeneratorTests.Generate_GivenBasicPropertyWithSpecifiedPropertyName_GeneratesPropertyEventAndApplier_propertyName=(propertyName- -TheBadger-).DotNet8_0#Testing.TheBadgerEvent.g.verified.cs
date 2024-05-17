@@ -19,7 +19,7 @@ namespace Testing
 	{
 		public Purview.EventSourcing.Aggregates.Events.EventDetails Details { get; set; } = new Purview.EventSourcing.Aggregates.Events.EventDetails();
 
-		public System.String? TheBadger { get; set; } = default!;
+		public string? TheBadger { get; set; } = default!;
 
 		override public int GetHashCode()
 		{

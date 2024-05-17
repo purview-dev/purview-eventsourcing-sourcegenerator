@@ -54,11 +54,8 @@ sealed class EmbeddedResources
 		var resource = LoadEmbeddedResource($"{source}{name}.cs")
 			.Replace("sealed public ", "sealed ");
 
-		if (!attachHeader)
-		{
-			return resource;
-		}
-
-		return AddHeader(resource);
+		return attachHeader
+			? AddHeader(resource)
+			: resource;
 	}
 }

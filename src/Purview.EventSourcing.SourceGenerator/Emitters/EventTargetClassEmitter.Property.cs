@@ -53,6 +53,9 @@ partial class EventTargetClassEmitter
 			.AppendLine();
 		;
 
+		if (!target.ValidationAttributes.IsEmpty)
+			EmitValidationPropertyAttributes(target, builder, indent + 1);
+
 		builder
 			.Append(indent + 1, "public ", withNewLine: false)
 			.Append(target.PropertyType);
@@ -126,5 +129,53 @@ partial class EventTargetClassEmitter
 		;
 
 		return indent;
+	}
+
+	static void EmitValidationPropertyAttributes(EventPropertyGenerationTarget target, StringBuilder builder, int indent)
+	{
+		foreach (var attrib in target.ValidationAttributes)
+		{
+			builder
+				.Append(indent, '[', withNewLine: false)
+				.Append(attrib.AttributeDetails);
+
+			if (attrib.HasArguments)
+			{
+				builder.Append('(');
+
+				if (!attrib.CtorArgs.IsEmpty)
+				{
+					for (var i = 0; i < attrib.CtorArgs.Length; i++)
+					{
+						builder.Append(attrib.CtorArgs[i]);
+						if (i < attrib.CtorArgs.Length - 1 || !attrib.NamedArgs.IsEmpty)
+							builder.Append(", ");
+					}
+				}
+
+				if (!attrib.NamedArgs.IsEmpty)
+				{
+					var i = 0;
+					foreach (var kvp in attrib.NamedArgs)
+					{
+						builder
+							.Append(kvp.Key)
+							.Append(" = ")
+							.Append(kvp.Value)
+						;
+
+						if (i < attrib.NamedArgs.Count - 1)
+							builder.Append(", ");
+
+						i++;
+					}
+				}
+
+				builder.Append(')');
+			}
+
+			builder.AppendLine(']');
+
+		}
 	}
 }
