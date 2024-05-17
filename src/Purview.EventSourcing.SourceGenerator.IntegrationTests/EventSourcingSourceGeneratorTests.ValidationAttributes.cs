@@ -193,4 +193,32 @@ public partial class TestAggregate : IAggregate
 		// Assert
 		await TestHelpers.Verify(generationResult);
 	}
+
+	[Fact]
+	public async Task Generate_GivenEventAttributeHasMultipleStringParameters_GeneratesPropertyWithAttributes()
+	{
+		// Arrange
+		var basicAggregate = @"
+using Purview.EventSourcing;
+using Purview.EventSourcing.Aggregates;
+using System.ComponentModel.DataAnnotations;
+
+namespace Testing;
+
+[GenerateAggregate]
+public partial class TestAggregate : IAggregate
+{
+	[EventProperty]
+	[DeniedValues(""\n"", ""\r"", ""\t"")]
+	[AllowedValues(values: [""12"", 123], ErrorMessage = ""Hello"")]
+	string? _stringValue;
+}
+";
+
+		// Act
+		var generationResult = await GenerateAsync(basicAggregate);
+
+		// Assert
+		await TestHelpers.Verify(generationResult);
+	}
 }

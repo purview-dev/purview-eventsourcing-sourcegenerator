@@ -107,25 +107,36 @@ partial class PipelineHelpers
 
 			foreach (var arg in attribute.ConstructorArguments)
 			{
-				// Get the fully qualified name of the parameter type
-				var attribValue = arg.Value?.ToString();
-				if (!arg.IsNull && arg.Type != null && SharedHelpers.IsString(arg.Type))
-					attribValue = attribValue!.Wrap();
-				else if (arg.IsNull)
-					attribValue = "null";
+				token.ThrowIfCancellationRequested();
+
+				if (arg.Kind == TypedConstantKind.Array)
+				{
+					// Get the fully qualified name of the parameter type
+					var attribValues = arg.Values.Select(ParseContent).ToArray();
+					ctorArgs.Add($"new {arg.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} {{{string.Join(", ", attribValues)}}}");
+					continue;
+				}
+
+				var attribValue = ParseContent(arg);
 
 				ctorArgs.Add(attribValue!);
 			}
 
 			foreach (var arg in attribute.NamedArguments)
 			{
+				token.ThrowIfCancellationRequested();
+
 				// Get the fully qualified name of the property
 				string propertyName = arg.Key;
-				var attribValue = arg.Value.Value?.ToString();
-				if (!arg.Value.IsNull && arg.Value.Type != null && SharedHelpers.IsString(arg.Value.Type))
-					attribValue = attribValue!.Wrap();
-				else if (arg.Value.IsNull)
-					attribValue = "null";
+				string? attribValue = null;
+				if (arg.Value.Kind == TypedConstantKind.Array)
+				{
+					// Get the fully qualified name of the parameter type
+					var attribValues = arg.Value.Values.Select(ParseContent).ToArray();
+					ctorArgs.Add($"new {arg.Value.Type!.ToDisplayString(SymbolDisplayFormat.FullyQualifiedFormat)} {{{string.Join(", ", attribValues)}}}");
+				}
+				else
+					attribValue = ParseContent(arg.Value);
 
 				namedArgs.Add(propertyName, attribValue!);
 			}
@@ -134,5 +145,17 @@ partial class PipelineHelpers
 		}
 
 		return [.. validators];
+
+		static string ParseContent(TypedConstant typedConstant)
+		{
+			var value = typedConstant.Value?.ToString();
+			if (typedConstant.IsNull)
+				return "null";
+
+			if (typedConstant.Type != null && SharedHelpers.IsString(typedConstant.Type))
+				return System.Text.RegularExpressions.Regex.Escape(value!).Wrap();
+
+			return value!;
+		}
 	}
 }
